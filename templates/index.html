@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html >
+<!--From https://codepen.io/frytyler/pen/EGdtg-->
+<head>
+  <meta charset="UTF-8">
+  <title>ML API</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+  
+</head>
+
+<body>
+ <div class="login">
+	<h1><center>Harry Potter or Star Wars</center></h1>
+    <p>This web app based on machine learning is created to the classify a tune either as "Harry Potter" or "Star Wars". To do so, click the upload button below, and select the the audio file.</p>
+
+     <!-- Main Input For Receiving Query to our ML -->
+    <form action="{{ url_for('predict')}}"method="post" enctype="multipart/form-data">
+        <div>
+            <label>Select audio file</label>
+            <div>
+                <input type = "file" class="audio-input" name = "file" />
+            </div>
+
+        </div>
+
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+
+   <br>
+   <br>
+   {{ prediction_text }}
+
+ </div>
+
+
+</body>
+</html>
