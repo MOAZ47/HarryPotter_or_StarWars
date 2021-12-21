@@ -1,5 +1,5 @@
 xgboost==0.90
-ipywidgets
-voila
+ipywidgets==7.6.3
+voila==0.3.0
 librosa>=0.8.1
-numpy
+numpy==1.20.1
