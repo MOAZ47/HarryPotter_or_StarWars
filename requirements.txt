@@ -1,4 +1,4 @@
-xgboost>=1.5.1
+xgboost==0.9
 ipywidgets
 voila
 librosa>=0.8.1
