@@ -1,0 +1,5 @@
+xgboost>=1.5.1
+ipywidgets
+voila
+librosa>=0.8.1
+numpy
