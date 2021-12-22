@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template,redirect, url_for, flash
-#import numpy as np
+import numpy as np
 from xgboost import XGBClassifier
 import os
-import torch, torchaudio
+import torchaudio
 
 app = Flask(__name__)
 model = XGBClassifier()
@@ -62,7 +62,7 @@ def predict():
                 mel_spectogram_resampled = resampler(signal)
             
             if mel_spectogram_resampled.shape[0] > 1:
-                mel_signal = torch.mean(mel_spectogram_resampled, dim=0, keepdim=True)
+                mel_signal = np.mean(mel_spectogram_resampled, dim=0, keepdim=True)
             
             if mel_signal.shape[1] > NMEL:
                 mel_signal = mel_signal[:, :NMEL]
