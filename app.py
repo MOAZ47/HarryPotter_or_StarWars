@@ -2,11 +2,11 @@ from flask import Flask, request, render_template,redirect, url_for, flash
 import numpy as np
 from xgboost import XGBClassifier
 import os
-import librosa
+import torch, torchaudio
 
 app = Flask(__name__)
 model = XGBClassifier()
-model.load_model("XBG_model.pth")
+model.load_model("Audio_XBG_model.pth")
 
 app.secret_key = "hello"
 
@@ -33,6 +33,7 @@ def predict():
                 return redirect(url_for('nofile'))
 
             audio_file.save(audio_file.filename)
+            """
             print("Audio File: ",audio_file)
 
             audio, sample_rate = librosa.load(audio_file.filename, res_type='kaiser_fast')
@@ -42,10 +43,27 @@ def predict():
                 return mfccs_scaled_features
             test_audio = mfcc_extractor(audio, sample_rate)
             test_audio.shape = -1,64
+            """
+            signal, sr = torchaudio.load(audio_file.filename)
 
-            #print(type(test_audio))
+            SAMPLE_RATE = 22050
+            NFFT = 1024
+            HLEN = 512
+            NMEL = 64
 
-            prediction_index = model.predict(np.array(test_audio.tolist()))
+            mel_spectogram = torchaudio.transforms.MelSpectrogram(
+                sample_rate=SAMPLE_RATE,
+                n_fft=NFFT,
+                hop_length=HLEN,
+                n_mels=NMEL
+            )(signal)
+            mel_spectogram = torch.mean(signal, dim=0, keepdim=True)
+            resampler = torchaudio.transforms.Resample(sr, SAMPLE_RATE)
+            mel_spectogram_resampled = resampler(mel_spectogram)
+            mel_signal = mel_spectogram_resampled.numpy()
+            mel_signal = mel_signal[:, :64]
+
+            prediction_index = model.predict(np.array(mel_signal.tolist()))
             class_mapping = [
             "Star Wars",
             "Harry Potter"
