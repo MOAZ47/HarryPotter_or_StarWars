@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template,redirect, url_for, flash
-import numpy as np
+#import numpy as np
 from xgboost import XGBClassifier
 import os
 import torch, torchaudio
@@ -45,29 +45,36 @@ def predict():
             test_audio.shape = -1,64
             """
             signal, sr = torchaudio.load(audio_file.filename)
-
+            
             SAMPLE_RATE = 22050
             NFFT = 1024
             HLEN = 512
             NMEL = 64
-
+            
             mel_spectogram = torchaudio.transforms.MelSpectrogram(
-                sample_rate=SAMPLE_RATE,
-                n_fft=NFFT,
-                hop_length=HLEN,
-                n_mels=NMEL
-            )(signal)
-            mel_spectogram = torch.mean(signal, dim=0, keepdim=True)
-            resampler = torchaudio.transforms.Resample(sr, SAMPLE_RATE)
-            mel_spectogram_resampled = resampler(mel_spectogram)
-            mel_signal = mel_spectogram_resampled.numpy()
-            mel_signal = mel_signal[:, :64]
+                sample_rate= SAMPLE_RATE,
+                n_fft= NFFT,
+                hop_length= HLEN,
+                n_mels= NMEL)(signal)
+            
+            if sr != SAMPLE_RATE:
+                resampler = torchaudio.transforms.Resample(sr, 22050)
+                mel_spectogram_resampled = resampler(signal)
+            
+            if mel_spectogram_resampled.shape[0] > 1:
+                mel_signal = torch.mean(mel_spectogram_resampled, dim=0, keepdim=True)
+            
+            if mel_signal.shape[1] > NMEL:
+                mel_signal = mel_signal[:, :NMEL]
 
-            prediction_index = model.predict(np.array(mel_signal.tolist()))
+            
             class_mapping = [
             "Star Wars",
             "Harry Potter"
             ]
+
+            #prediction_index = model.predict(np.array(mel_signal.tolist()))
+            prediction_index = model.predict(mel_signal.tolist())
             prediction = class_mapping[prediction_index[0]]
 
             # Remove audio file
